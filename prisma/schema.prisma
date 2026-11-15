@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum TipeTransaksi {
+  MASUK
+  KELUAR    
+}
+
+enum Satuan {
+  MG
+  GRAM
+  KG
+}
+
+enum StatusPenerimaan {
+  MENUNGGU
+  DITERIMA
+  DIBATALKAN
+}
+
+model User {
+  id               String             @id @default(uuid())
+  name             String
+  email            String             @unique
+  password         String             // Akan menyimpan hash bcrypt
+  role             Role               @default(STAFF)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  
+  // Relasi
+  logTransaksi     LogTransaksi[]
+  jadwalShift      JadwalShift[]
+  penerimaanBahan  JadwalPenerimaan[]
+}
+
+model Kategori {
+  id            String      @id @default(uuid())
+  namaKategori  String      @unique
+  deskripsi     String?
+  bahanBaku     BahanBaku[]
+}
+
+model BahanBaku {
+  id               String             @id @default(uuid())
+  namaBahan        String
+  stokTotal        Float              @default(0) // SELALU disimpan dalam satuan GRAM
+  kategoriId       String
+  kategori         Kategori           @relation(fields: [kategoriId], references: [id], onDelete: Restrict)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  // Relasi
+  logTransaksi     LogTransaksi[]
+  jadwalPenerimaan JadwalPenerimaan[]
+}
+
+model LogTransaksi {
+  id                String        @id @default(uuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bahanBakuId       String
+  bahanBaku         BahanBaku     @relation(fields: [bahanBakuId], references: [id], onDelete: Restrict)
+  
+  tipe              TipeTransaksi
+  jumlahInput       Float         // Angka mentah yang diketik user
+  satuanInput       Satuan        // mg, gram, atau kg
+  jumlahTerkonversi Float         // Hasil konversi mutlak ke gram untuk audit
+  keterangan        String?       // Misal: "Produksi Croissant", "Tepung tumpah"
+  timestamp         DateTime      @default(now()) // Waktu presisi (Audit Trail)
+}
+
+model JadwalShift {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hari        String   // Misal: "Senin", "Selasa"
+  jamMulai    String   // Misal: "07:00"
+  jamSelesai  String   // Misal: "15:00"
+}
+
+model JadwalPenerimaan {
+  id                       String           @id @default(uuid())
+  namaSupplier             String
+  tanggalRencanaPenerimaan DateTime
+  status                   StatusPenerimaan @default(MENUNGGU)
+  
+  bahanBakuId              String
+  bahanBaku                BahanBaku        @relation(fields: [bahanBakuId], references: [id], onDelete: Restrict)
+  jumlahDipesan            Float
+  satuanDipesan            Satuan
+
+  penerimaId               String?          // Siapa staff yang menerima barangnya
+  penerima                 User?            @relation(fields: [penerimaId], references: [id], onDelete: SetNull)
+}
