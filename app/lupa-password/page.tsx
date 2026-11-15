@@ -207,7 +207,7 @@ export default function LupaPasswordPage() {
             </h1>
             <p className="text-stone-500 text-xs sm:text-sm leading-relaxed">
               {step === 1
-                ? "Masukkan email Administrator untuk menerima kode OTP verifikasi"
+                ? "Masukkan email admin atau staff untuk menerima kode OTP verifikasi"
                 : "Masukkan 6-digit kode OTP dan tentukan kata sandi baru Anda"}
             </p>
           </div>
@@ -244,7 +244,7 @@ export default function LupaPasswordPage() {
                 htmlFor="email"
                 className="block text-xs font-semibold text-stone-700 tracking-wide"
               >
-                Email Administrator
+                Masukkan Email 
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400 group-focus-within:text-amber-700 transition-colors">

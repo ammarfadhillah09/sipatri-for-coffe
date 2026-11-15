@@ -18,15 +18,15 @@ export type ActionResponse = {
 async function verifyAdminSession() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
-    return { authorized: false, error: "Akses ditolak. Silakan masuk terlebih dahulu." };
+    return { authorized: false as const, error: "Akses ditolak. Silakan masuk terlebih dahulu." };
   }
   if (session.user.role !== "ADMIN") {
     return {
-      authorized: false,
+      authorized: false as const,
       error: "Akses ditolak: Hanya Administrator yang diizinkan.",
     };
   }
-  return { authorized: true, session };
+  return { authorized: true as const, session };
 }
 
 /**
@@ -36,7 +36,7 @@ export async function createStaffAction(
   formData: FormData
 ): Promise<ActionResponse> {
   const auth = await verifyAdminSession();
-  if (!auth.authorized) {
+  if (!auth.authorized || !auth.session) {
     return { error: auth.error };
   }
 
@@ -106,7 +106,7 @@ export async function updateStaffAction(
   formData: FormData
 ): Promise<ActionResponse> {
   const auth = await verifyAdminSession();
-  if (!auth.authorized) {
+  if (!auth.authorized || !auth.session) {
     return { error: auth.error };
   }
 
@@ -118,7 +118,7 @@ export async function updateStaffAction(
   const name = formData.get("name")?.toString().trim();
   const email = formData.get("email")?.toString().toLowerCase().trim();
   const role = formData.get("role")?.toString();
-  const oldPassword = formData.get("oldPassword")?.toString();
+  const adminPassword = (formData.get("adminPassword") || formData.get("oldPassword"))?.toString();
   const newPassword = formData.get("newPassword")?.toString()?.trim();
 
   if (!name || name.length < 2 || name.length > 100) {
@@ -177,17 +177,42 @@ export async function updateStaffAction(
 
     // Validasi dan update kata sandi jika password baru diisi
     if (newPassword && newPassword.length > 0) {
-      if (!oldPassword) {
-        return { error: "Kata sandi saat ini wajib diisi untuk merubah kata sandi!" };
+      if (!adminPassword) {
+        return {
+          error:
+            "Masukkan kata sandi Admin Anda untuk mengonfirmasi perubahan password!",
+        };
       }
 
       if (newPassword.length < 6 || newPassword.length > 128) {
         return { error: "Kata sandi baru minimal 6 dan maksimal 128 karakter." };
       }
 
-      const isPasswordMatch = await bcrypt.compare(oldPassword, existingUser.password);
+      // Ambil data akun Admin yang sedang login dari database untuk otorisasi
+      const adminLookup = auth.session.user.id
+        ? { id: auth.session.user.id }
+        : auth.session.user.email
+        ? { email: auth.session.user.email }
+        : null;
+
+      if (!adminLookup) {
+        return { error: "Sesi Administrator tidak valid. Silakan masuk kembali." };
+      }
+
+      const currentAdmin = await prisma.user.findUnique({
+        where: adminLookup,
+      });
+
+      if (!currentAdmin || currentAdmin.role !== "ADMIN") {
+        return { error: "Akses ditolak: Akun Administrator tidak valid." };
+      }
+
+      const isPasswordMatch = await bcrypt.compare(
+        adminPassword,
+        currentAdmin.password
+      );
       if (!isPasswordMatch) {
-        return { error: "Kata sandi saat ini salah!" };
+        return { error: "Kata sandi Admin salah! Otorisasi ditolak." };
       }
 
       updateData.password = await bcrypt.hash(newPassword, 10);
