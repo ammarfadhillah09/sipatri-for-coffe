@@ -72,6 +72,8 @@ export function StaffManager({ users, currentUserId }: StaffManagerProps) {
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editRole, setEditRole] = useState<"STAFF" | "ADMIN">("STAFF");
+  const [oldPassword, setOldPassword] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [editNewPassword, setEditNewPassword] = useState("");
   const [showEditPassword, setShowEditPassword] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -166,6 +168,8 @@ export function StaffManager({ users, currentUserId }: StaffManagerProps) {
     setEditName(user.name);
     setEditEmail(user.email);
     setEditRole(user.role);
+    setOldPassword("");
+    setShowOldPassword(false);
     setEditNewPassword("");
     setShowEditPassword(false);
   };
@@ -184,9 +188,15 @@ export function StaffManager({ users, currentUserId }: StaffManagerProps) {
       setErrorMessage("Alamat email tidak boleh kosong.");
       return;
     }
-    if (editNewPassword && editNewPassword.length < 6) {
-      setErrorMessage("Kata sandi baru minimal 6 karakter.");
-      return;
+    if (editNewPassword.trim()) {
+      if (!oldPassword) {
+        setErrorMessage("Kata sandi saat ini wajib diisi untuk merubah kata sandi!");
+        return;
+      }
+      if (editNewPassword.trim().length < 6) {
+        setErrorMessage("Kata sandi baru minimal 6 karakter.");
+        return;
+      }
     }
 
     const formData = new FormData();
@@ -194,6 +204,7 @@ export function StaffManager({ users, currentUserId }: StaffManagerProps) {
     formData.append("email", editEmail.trim().toLowerCase());
     formData.append("role", editRole);
     if (editNewPassword.trim()) {
+      formData.append("oldPassword", oldPassword);
       formData.append("newPassword", editNewPassword.trim());
     }
 
@@ -662,6 +673,42 @@ export function StaffManager({ users, currentUserId }: StaffManagerProps) {
                     <option value="STAFF">Staf Dapur (STAFF)</option>
                     <option value="ADMIN">Administrator (ADMIN)</option>
                   </select>
+                </div>
+
+                {/* Field: Password Saat Ini (Wajib jika Kata Sandi Baru diisi) */}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="edit-old-password"
+                    className="block text-xs font-medium text-stone-700"
+                  >
+                    Kata Sandi Saat Ini {editNewPassword.trim() ? <span className="text-amber-700">*</span> : null}
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="edit-old-password"
+                      type={showOldPassword ? "text" : "password"}
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      required={!!editNewPassword.trim()}
+                      placeholder="Masukkan kata sandi saat ini"
+                      className="w-full rounded-xl border border-stone-200/80 bg-white/90 px-3.5 py-2.5 pr-10 text-sm text-stone-800 placeholder:text-stone-400 shadow-2xs transition-all focus:border-amber-400/80 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                      aria-label={showOldPassword ? "Sembunyikan kata sandi saat ini" : "Tampilkan kata sandi saat ini"}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-stone-400 hover:text-stone-600 cursor-pointer"
+                    >
+                      {showOldPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-stone-500">
+                    Wajib diisi jika Anda ingin mengubah kata sandi akun ini.
+                  </p>
                 </div>
 
                 {/* Field: Password Baru (Opsional) */}

@@ -118,6 +118,7 @@ export async function updateStaffAction(
   const name = formData.get("name")?.toString().trim();
   const email = formData.get("email")?.toString().toLowerCase().trim();
   const role = formData.get("role")?.toString();
+  const oldPassword = formData.get("oldPassword")?.toString();
   const newPassword = formData.get("newPassword")?.toString()?.trim();
 
   if (!name || name.length < 2 || name.length > 100) {
@@ -174,11 +175,21 @@ export async function updateStaffAction(
       role: role as "ADMIN" | "STAFF",
     };
 
-    // Re-hash password hanya jika password baru diisi
+    // Validasi dan update kata sandi jika password baru diisi
     if (newPassword && newPassword.length > 0) {
+      if (!oldPassword) {
+        return { error: "Kata sandi saat ini wajib diisi untuk merubah kata sandi!" };
+      }
+
       if (newPassword.length < 6 || newPassword.length > 128) {
         return { error: "Kata sandi baru minimal 6 dan maksimal 128 karakter." };
       }
+
+      const isPasswordMatch = await bcrypt.compare(oldPassword, existingUser.password);
+      if (!isPasswordMatch) {
+        return { error: "Kata sandi saat ini salah!" };
+      }
+
       updateData.password = await bcrypt.hash(newPassword, 10);
     }
 
