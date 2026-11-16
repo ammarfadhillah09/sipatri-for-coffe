@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<h1 align="center">SIPATRI - Sistem Inventori Pastry For Coffe</h1>
 
-## Getting Started
+<p align="center">
+  Sistem Manajemen Inventori presisi berbasis web yang dirancang khusus untuk operasional Dapur Pastry & Bakery. Dibangun dengan fokus pada kecepatan, akurasi data, dan penerapan keamanan siber (*security-by-design*).
+</p>
 
-First, run the development server:
+<p align="center">
+  <a href="#fitur-utama">Fitur Utama</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#instalasi--menjalankan-lokal">Instalasi</a> •
+  <a href="#arsitektur-keamanan-cyber-security">Keamanan</a>
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Fitur Utama
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Manajemen Inventori Real-Time:** Pencatatan mutasi stok (masuk/keluar) secara akurat dengan peringatan batas stok kritis.
+- **Role-Based Access Control (RBAC):** Pemisahan hak akses yang tegas antara **Administrator** (kontrol penuh) dan **Staf Dapur** (pencatatan operasional harian).
+- **Laporan Resmi (Export to PDF):** Menghasilkan laporan riwayat mutasi stok berformat surat resmi A4 dengan kop surat instansi yang siap dicetak.
+- **Pemulihan Akun Berbasis OTP:** Fitur "Lupa Kata Sandi" mandiri menggunakan *One-Time Password* (OTP) 6 digit via email dengan batas waktu kadaluarsa (5 menit).
+- **Admin Sudo-Mode:** Pencegahan pengambilalihan akun staf melalui verifikasi ulang kata sandi Administrator saat melakukan reset kredensial.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Tech Stack
 
-## Learn More
+Aplikasi ini dibangun menggunakan ekosistem JavaScript/TypeScript modern:
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** [Next.js 16 (App Router)](https://nextjs.org/) & [React](https://react.dev/)
+- **Bahasa Pemrograman:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/)
+- **Database & ORM:** [PostgreSQL](https://www.postgresql.org/) & [Prisma ORM v5](https://www.prisma.io/)
+- **Autentikasi:** [NextAuth.js (v4)](https://next-auth.js.org/) & `bcryptjs`
+- **Email Service:** `nodemailer` (untuk pengiriman OTP)
+- **Validasi Data:** [Zod](https://zod.dev/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛡 Arsitektur Keamanan (Cyber Security)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+SIPATRI dirancang dengan standar keamanan web modern untuk memitigasi kerentanan umum (OWASP Top 10):
+1. **Pencegahan SQL Injection:** Eksekusi kueri basis data menggunakan *Parameterized Queries* melalui Prisma ORM.
+2. **Pencegahan XSS:** Validasi input ketat di sisi *server* (Zod) dan *auto-escaping* pada komponen antarmuka React.
+3. **Manajemen Sesi Aman:** Menggunakan *cookie* terenkripsi dengan atribut `HttpOnly`, `Secure`, dan `SameSite`.
+4. **Isolasi Infrastruktur (Production):** Dideploy pada Linux VPS menggunakan **Cloudflare Tunnel (`cloudflared`)** untuk menegakkan enkripsi SSL/TLS (HTTPS penuh) tanpa membuka port *inbound* ke internet publik.
 
-## Deploy on Vercel
+## 💻 Instalasi & Menjalankan Lokal
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ikuti langkah-langkah berikut untuk menjalankan SIPATRI di perangkat lokal Anda.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Prasyarat
+- Node.js (v18.x atau terbaru)
+- PostgreSQL (berjalan di lokal atau *cloud* seperti Supabase/Neon)
+- Akun Email SMTP (untuk fitur pengiriman OTP)
+
+### Langkah Instalasi
+
+1. **Clone repositori ini:**
+   ```bash
+   git clone [https://github.com/ammarfadhillah09/sipatri-for-coffe.git](https://github.com/ammarfadhillah09/sipatri-for-coffe.git)
+   cd sipatri-for-coffe
