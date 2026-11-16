@@ -46,10 +46,10 @@ async function AuthenticatedDashboard({
 
   return (
     <div
-      className={`${font.className} min-h-screen bg-[#FFFCF5] text-stone-800 antialiased lg:flex`}
+      className={`${font.className} min-h-screen bg-[#FFFCF5] text-stone-800 antialiased lg:flex print:block print:bg-white print:min-h-0`}
     >
       {/* Sidebar (desktop) */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-stone-200/70 bg-[#FFFAF0]/80 px-4 py-6 backdrop-blur lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-stone-200/70 bg-[#FFFAF0]/80 px-4 py-6 backdrop-blur lg:flex print:hidden">
         <div className="px-2">
           <Brand />
         </div>
@@ -91,11 +91,11 @@ async function AuthenticatedDashboard({
       </aside>
 
       {/* Main column */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col print:block print:w-full print:m-0 print:p-0">
         {/* Mobile top bar with interactive slide-over drawer */}
         <MobileNav user={{ name, role, initials, rawRole }} />
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-14 lg:px-10 lg:py-12">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-14 lg:px-10 lg:py-12 print:m-0 print:p-0 print:max-w-none print:w-full print:bg-white">
           {children}
         </main>
       </div>

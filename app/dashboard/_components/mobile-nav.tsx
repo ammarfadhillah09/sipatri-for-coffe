@@ -61,7 +61,7 @@ export function MobileNav({ user }: MobileNavProps) {
   return (
     <>
       {/* Mobile & Tablet Header Bar (< lg) */}
-      <header className="sticky top-0 z-20 border-b border-stone-200/70 bg-[#FFFCF5]/90 px-4 py-3 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-20 border-b border-stone-200/70 bg-[#FFFCF5]/90 px-4 py-3 backdrop-blur lg:hidden print:hidden">
         <div className="flex items-center justify-between">
           <Brand />
           <button

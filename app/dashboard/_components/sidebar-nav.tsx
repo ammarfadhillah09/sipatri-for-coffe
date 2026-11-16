@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ArrowLeftRight, Home, Package, Tags, Users } from "lucide-react";
+import { ArrowLeftRight, FileText, Home, Package, Tags, Users } from "lucide-react";
 
 interface NavItem {
   href: string;
@@ -18,6 +18,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/kategori", label: "Kategori Bahan", icon: Tags, adminOnly: true },
   { href: "/dashboard/transaksi", label: "Kelola Bahan", icon: ArrowLeftRight },
   { href: "/dashboard/staff", label: "Kelola Staff", icon: Users, adminOnly: true },
+  { href: "/dashboard/laporan", label: "Cetak Laporan", icon: FileText },
 ];
 
 export function SidebarNav({
